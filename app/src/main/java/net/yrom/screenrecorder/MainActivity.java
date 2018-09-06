@@ -46,7 +46,13 @@ import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import net.yrom.screenrecorder.pdf.MessageEvent;
+import net.yrom.screenrecorder.pdf.PdfViewActivity;
 import net.yrom.screenrecorder.view.NamedSpinner;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -99,7 +105,7 @@ public class MainActivity extends Activity {
         mMediaProjectionManager = (MediaProjectionManager) getApplicationContext().getSystemService(MEDIA_PROJECTION_SERVICE);
         mNotifications = new Notifications(getApplicationContext());
         bindViews();
-
+        EventBus.getDefault().register(this);
         Utils.findEncodersByTypeAsync(VIDEO_AVC, infos -> {
             logCodecInfos(infos, VIDEO_AVC);
             mAvcCodecInfos = infos;
@@ -265,8 +271,10 @@ public class MainActivity extends Activity {
     }
 
     @Override
+
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         saveSelections();
         stopRecorder();
     }
@@ -341,7 +349,8 @@ public class MainActivity extends Activity {
         mRecorder.start();
         mButton.setText("Stop Recorder");
         registerReceiver(mStopActionReceiver, new IntentFilter(ACTION_STOP));
-        moveTaskToBack(true);
+//        moveTaskToBack(true);
+        startActivity(new Intent(this,PdfViewActivity.class));
     }
 
     private void stopRecorder() {
@@ -863,4 +872,11 @@ public class MainActivity extends Activity {
         }
     };
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {/* Do something */
+        if(event.getType()==1) {
+            Toast.makeText(MainActivity.this,"停止录制咯",Toast.LENGTH_LONG).show();
+            stopRecorder();
+        }
+    };
 }

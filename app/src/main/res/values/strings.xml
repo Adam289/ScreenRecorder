@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Screen Recorder</string>
+    <string name="app_name">录屏Demo</string>
+    <string name="title_activity_pdf_view">pdf详情</string>
 </resources>
